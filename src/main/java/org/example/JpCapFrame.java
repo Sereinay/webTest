@@ -5,13 +5,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 
-/**
- * 流式布局
- */
 public class JpCapFrame extends JFrame {
     private static DefaultTableModel model;
     private static JTextField filterField;
-
     private static JTextField networkCardField;
     private JTextArea showArea;
     private JButton startBtn;
@@ -35,7 +31,6 @@ public class JpCapFrame extends JFrame {
     public JButton getStartBtn() {
         return startBtn;
     }
-
 
     public JButton getCheckBtn() {
         return checkBtn;
@@ -63,103 +58,78 @@ public class JpCapFrame extends JFrame {
         Font font2 = new Font("宋体", Font.PLAIN, 16);
         Font font3 = new Font("微软雅黑", Font.PLAIN, 16);
 
-        //界面
         setSize(1550, 1000);
-        setVisible(true);
         setTitle("Captor");
         Container container = this.getContentPane();
+        container.setLayout(new BorderLayout());
 
-        //顶部
-        JPanel pane = new JPanel();
-        pane.setBounds(0, 0, 775, 150);
-        pane.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        pane.setPreferredSize(new Dimension(775, 27));
-
+        // 顶部面板
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         checkBtn = new JButton("查看网卡信息");
         checkBtn.setFont(font4);
-        checkBtn.setBounds(0, 0, 50, 0);
-        pane.add(checkBtn);
+        topPanel.add(checkBtn);
 
         startBtn = new JButton("开始");
         startBtn.setFont(font4);
-        startBtn.setBounds(0, 0, 50, 0);
-        pane.add(startBtn);
+        topPanel.add(startBtn);
 
         clearBtn = new JButton("清空");
         clearBtn.setFont(font4);
-        clearBtn.setBounds(0, 0, 50, 0);
-        pane.add(clearBtn);
+        topPanel.add(clearBtn);
 
         exitBtn = new JButton("退出");
         exitBtn.setFont(font4);
-        exitBtn.setBounds(0, 0, 50, 0);
-        pane.add(exitBtn);
+        topPanel.add(exitBtn);
 
-        JPanel panelTest = new JPanel();
-        panelTest.setBounds(775, 0, 775, 150);
-        panelTest.setPreferredSize(new Dimension(775, 27));
-        panelTest.setLayout(new FlowLayout(FlowLayout.RIGHT, 20, 0));
-
+        // 网络卡选择和过滤器输入面板
+        JPanel networkPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
         JLabel selectNetworkCard = new JLabel("选择网卡:");
-        selectNetworkCard.setFont(font1); // 设置字体
-        selectNetworkCard.setBounds(0, 0, 500, 0);
+        selectNetworkCard.setFont(font1);
+        networkPanel.add(selectNetworkCard);
+
         networkCardField = new JTextField(10);
-        networkCardField.setBounds(200,0,20,0);
-        panelTest.add(selectNetworkCard);
-        panelTest.add(networkCardField);
+        networkPanel.add(networkCardField);
 
-        JLabel filter = new JLabel("过滤器:");
-        filter.setFont(font1);
-        filter.setBounds(0, 0, 500, 0);
+        JLabel filterLabel = new JLabel("过滤器:");
+        filterLabel.setFont(font1);
+        networkPanel.add(filterLabel);
+
         filterField = new JTextField(50);
-        filterField.setBounds(200, 0, 500, 0);
-        panelTest.add(filter);
-        panelTest.add(filterField);
+        networkPanel.add(filterField);
 
+        // 将两个顶部面板合并
+        JPanel topContainer = new JPanel(new BorderLayout());
+        topContainer.add(topPanel, BorderLayout.WEST);
+        topContainer.add(networkPanel, BorderLayout.EAST);
 
-        //中部主体内容显示区
-        String[] name = {"序号.", "时间", "源ip", "目的ip", "协议", "包长度", "内容"};
-        //model = new DefaultTableModel();
-        //model.setColumnIdentifiers(name);
+        // 表格
+        String[] columnNames = {"序号", "时间", "源IP", "目的IP", "协议", "包长度", "内容"};
+        model = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(model);
         JTableHeader tableHeader = table.getTableHeader();
         tableHeader.setFont(font1);
         table.setFont(font2);
         table.setRowHeight(20);
-        model = (DefaultTableModel) table.getModel();
-        model.setColumnIdentifiers(name);
         table.setEnabled(false);
-        JScrollPane jScrollPane = new JScrollPane(table);
-        jScrollPane.setBounds(0, 300, 1550, 600);
+        JScrollPane tableScrollPane = new JScrollPane(table);
+        tableScrollPane.setPreferredSize(new Dimension(1550, 600));
 
-        //底部
-        JPanel pane2 = new JPanel();
-        pane2.setLayout(new BorderLayout());
-        pane2.setPreferredSize(new Dimension(1550, 300));
-
-        showArea = new JTextArea(5, 5);
-        //showArea.setBounds(0,0,1200,300);
-        //showArea.setText("Test");
+        // 日志显示区
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        showArea = new JTextArea();
         showArea.setEditable(false);
         showArea.setLineWrap(false);
         showArea.setFont(font3);
-        //showArea.setBackground(Color.GRAY);
-        //pane2.add(showArea);
-        pane2.setSize(10, 10);
-        pane2.setBounds(0, 0, 1, 1);
-        //给textArea添加滚动条
-        JScrollPane scrollPane = new JScrollPane(showArea);
-        scrollPane.setBounds(0, 0, 1, 1);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane logScrollPane = new JScrollPane(showArea);
+        logScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        logScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        bottomPanel.add(logScrollPane, BorderLayout.CENTER);
+        bottomPanel.setPreferredSize(new Dimension(1550, 300));
 
-        pane2.add(scrollPane, BorderLayout.CENTER);
-        scrollPane.setViewportView(showArea);
-
-        container.add(jScrollPane, BorderLayout.CENTER);
-        container.add(pane, BorderLayout.NORTH);
-        container.add(panelTest, BorderLayout.NORTH);
-        container.add(pane2, BorderLayout.SOUTH);
+        // 添加组件到容器
+        container.add(topContainer, BorderLayout.NORTH);
+        container.add(tableScrollPane, BorderLayout.CENTER);
+        container.add(bottomPanel, BorderLayout.SOUTH);
 
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
