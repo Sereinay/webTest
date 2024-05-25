@@ -21,9 +21,6 @@ public class JpCapMain implements Runnable {
         // 绑定网络设备
         devices = JpcapCaptor.getDeviceList();
 
-        int caplen = 1512;
-        boolean promiscCheck = true;
-
         try {
             updateDevice();
         } catch (IOException e) {
@@ -80,18 +77,31 @@ public class JpCapMain implements Runnable {
                 frame.getShowArea().append("更新设备时发生IO异常\n");
             }
         });
+
+        frame.getNetworkCardField().addActionListener(e -> {
+            String input = frame.getNetworkCardField().getText();
+            try {
+                int index = Integer.parseInt(input);
+                if (index >= 0 && index < devices.length) {
+                    deviceIndex = index;
+                    updateDevice();
+                    frame.getShowArea().append("更新到设备: " + devices[deviceIndex].name + " | " + devices[deviceIndex].description + "\n");
+                } else {
+                    frame.getShowArea().append("非法输入: 请输入0到" + (devices.length - 1) + "之间的数字\n");
+                }
+            } catch (NumberFormatException ex) {
+                frame.getShowArea().append("非法输入: 请输入一个有效的数字\n");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     private void updateDevice() throws IOException {
-        String temp = frame.getNetworkCardField().getText();
-        if (!temp.isEmpty() && Integer.parseInt(temp) >= 0 && Integer.parseInt(temp) < devices.length) {
-            deviceIndex = Integer.parseInt(temp);
-        }
         if (jpcap != null) {
             jpcap.close();
         }
         jpcap = JpcapCaptor.openDevice(devices[deviceIndex], 1512, true, 50);
-        frame.getShowArea().append("更新到设备: " + devices[deviceIndex].name + " | " + devices[deviceIndex].description + "\n");
     }
 
     public static void main(String[] args) {
