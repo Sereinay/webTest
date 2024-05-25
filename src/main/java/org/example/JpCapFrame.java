@@ -66,9 +66,8 @@ public class JpCapFrame extends JFrame {
         //界面
         setSize(1550, 1000);
         setVisible(true);
-        setTitle("网络抓包");
+        setTitle("Captor");
         Container container = this.getContentPane();
-
 
         //顶部
         JPanel pane = new JPanel();
@@ -166,4 +165,3 @@ public class JpCapFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
-

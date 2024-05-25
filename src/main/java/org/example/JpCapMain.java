@@ -22,6 +22,24 @@ public class JpCapMain implements Runnable {
         int caplen = 1512;
         boolean promiscCheck = true;
 
+            /*
+        default为0 可以根据自己的需求来更改成不同的
+        */
+        int device;
+        String temp = JpCapFrame.getFilterField().getText();
+        if (!temp.isEmpty() && Integer.parseInt(temp) >= 0 && Integer.parseInt(temp) < devices.length) {
+            device = Integer.parseInt(JpCapFrame.getFilterField().getText());
+        } else {
+            device = 6;
+        }
+        try {
+            jpcap = JpcapCaptor.openDevice(devices[device], caplen, promiscCheck, 50);
+        } catch (IOException e1) {
+            System.out.println("IO异常！");
+        }
+
+
+
 
         frame.getCheckBtn().addActionListener(e -> {
             frame.getShowArea().append("当前设备全部网络设备信息为： \n");
@@ -31,26 +49,12 @@ public class JpCapMain implements Runnable {
                 frame.getShowArea().append("序号: " + i + " " + n.name + "     |     " + n.description + "\n");
                 i++;
             }
-
-        });
-
-        frame.getStartBtn().addActionListener(e -> {
-            /*
-        default为0 可以根据自己的需求来更改成不同的
-        */
-            int device = 0;
-            String temp = JpCapFrame.getFilterField().getText();
-            if (!temp.isEmpty() && Integer.parseInt(temp) >= 0 && Integer.parseInt(temp) < devices.length) {
-                device = Integer.parseInt(JpCapFrame.getFilterField().getText());
-            }
-            try {
-                jpcap = JpcapCaptor.openDevice(devices[device], caplen, promiscCheck, 50);
-            } catch (IOException e1) {
-                System.out.println("IO异常！");
-            }
             frame.getShowArea().append(printSeparator(110, 1));
             frame.getShowArea().append("当前使用网卡信息： " + devices[device].name + "     |     " + devices[device].description + "\n");
             frame.getShowArea().append(printSeparator(110, 1));
+        });
+
+        frame.getStartBtn().addActionListener(e -> {
 
             if (pause) {
                 if (thread == null) {
