@@ -25,6 +25,12 @@ public class JpCapController implements Runnable {
         // 绑定网络设备
         devices = JpcapCaptor.getDeviceList();
 
+        if (devices.length == 0) {
+            System.out.println("无网卡信息！");
+            frame.getShowArea().append("未检测到网卡信息！！！");
+            return;
+        }
+
         try {
             updateDevice();
         } catch (IOException e) {
@@ -49,9 +55,9 @@ public class JpCapController implements Runnable {
             frame.getShowArea().append("序号: " + i + " " + n.name + " | " + n.description + "\n");
             i++;
         }
-        frame.getShowArea().append(printSeparator(110, 1));
+        frame.getShowArea().append(printSeparator(72, 1));
         frame.getShowArea().append("当前使用网卡信息： " + devices[deviceIndex].name + " | " + devices[deviceIndex].description + "\n");
-        frame.getShowArea().append(printSeparator(110, 1));
+        frame.getShowArea().append(printSeparator(72, 1));
     }
 
     public String printSeparator(int separator, int line) {
@@ -137,10 +143,10 @@ public class JpCapController implements Runnable {
             Packet packet = jpcap.getPacket();
             if (packet instanceof IPPacket ip && ip.version == 4) {
                 i++;
-                displayPacketInfo(ip);
+//                displayPacketInfo(ip);
+//                上面的代码是控制台调试的时候打印输出使用的
 
                 String protocol = getProtocol(ip);
-
                 String filterInput = JpCapFrame.getFilterField().getText();
                 if (filterInput.equals(ip.src_ip.getHostAddress()) ||
                         filterInput.equals(ip.dst_ip.getHostAddress()) ||
@@ -149,11 +155,11 @@ public class JpCapController implements Runnable {
                     ArrayList<String> dataList = new ArrayList<>();
                     Timestamp timestamp = new Timestamp((packet.sec * 1000) + (packet.usec / 1000));
 
-                    dataList.add(i + "");
-                    dataList.add(timestamp.toString());
-                    dataList.add(ip.src_ip.getHostAddress());
-                    dataList.add(ip.dst_ip.getHostAddress());
-                    dataList.add(protocol);
+                    dataList.add(i + "");//序号
+                    dataList.add(timestamp.toString());//时间
+                    dataList.add(ip.src_ip.getHostAddress());//源主机
+                    dataList.add(ip.dst_ip.getHostAddress());//目的主机
+                    dataList.add(protocol);//
                     dataList.add(String.valueOf(packet.data.length));
 
                     StringBuilder strTemp = new StringBuilder();
@@ -161,30 +167,49 @@ public class JpCapController implements Runnable {
                         strTemp.append(b);
                     }
                     dataList.add(strTemp.toString());
+
+                    ArrayList<String> packetInfoList = new ArrayList<>();
+                    packetInfoList.add("版本：IPv4");
+                    packetInfoList.add("优先权："+ ip.priority);
+                    packetInfoList.add("区分服务：最大的吞吐量：" + ip.t_flag);
+                    packetInfoList.add("区分服务：最高的可靠性：" + ip.r_flag);
+                    packetInfoList.add("长度：" + ip.length);
+                    packetInfoList.add("标识：" + ip.ident);
+                    packetInfoList.add("DF:Don't Fragment: " + ip.dont_frag);
+                    packetInfoList.add("NF:Nore Fragment: " + ip.more_frag);
+                    packetInfoList.add("片偏移：" + ip.offset);
+                    packetInfoList.add("生存时间：" + ip.hop_limit);
+                    packetInfoList.add("协议：" + getProtocol(ip));
+                    packetInfoList.add("源IP " + ip.src_ip.getHostAddress());
+                    packetInfoList.add("目的IP " + ip.dst_ip.getHostAddress());
                     JpCapFrame.getModel().addRow(dataList.toArray());
+                    for (String s : packetInfoList) {
+                        frame.getShowArea().append(s+"\n");
+                    }
+                    frame.getShowArea().append(printSeparator(72,1));
                 }
             }
         }
     }
 
-    private void displayPacketInfo(IPPacket ip) {
-        System.out.println("版本：IPv4");
-        System.out.println("优先权：" + ip.priority);
-        System.out.println("区分服务：最大的吞吐量：" + ip.t_flag);
-        System.out.println("区分服务：最高的可靠性：" + ip.r_flag);
-        System.out.println("长度：" + ip.length);
-        System.out.println("标识：" + ip.ident);
-        System.out.println("DF:Don't Fragment: " + ip.dont_frag);
-        System.out.println("NF:Nore Fragment: " + ip.more_frag);
-        System.out.println("片偏移：" + ip.offset);
-        System.out.println("生存时间：" + ip.hop_limit);
-        System.out.println("协议：" + getProtocol(ip));
-        System.out.println("源IP " + ip.src_ip.getHostAddress());
-        System.out.println("目的IP " + ip.dst_ip.getHostAddress());
-        System.out.println("源主机名： " + ip.src_ip);
-        System.out.println("目的主机名： " + ip.dst_ip);
-        System.out.println("----------------------------------------------");
-    }
+//    private void displayPacketInfo(IPPacket ip) {
+//        System.out.println("版本：IPv4");
+//        System.out.println("优先权：" + ip.priority);
+//        System.out.println("区分服务：最大的吞吐量：" + ip.t_flag);
+//        System.out.println("区分服务：最高的可靠性：" + ip.r_flag);
+//        System.out.println("长度：" + ip.length);
+//        System.out.println("标识：" + ip.ident);
+//        System.out.println("DF:Don't Fragment: " + ip.dont_frag);
+//        System.out.println("NF:Nore Fragment: " + ip.more_frag);
+//        System.out.println("片偏移：" + ip.offset);
+//        System.out.println("生存时间：" + ip.hop_limit);
+//        System.out.println("协议：" + getProtocol(ip));
+//        System.out.println("源IP " + ip.src_ip.getHostAddress());
+//        System.out.println("目的IP " + ip.dst_ip.getHostAddress());
+//        System.out.println("源主机名： " + ip.src_ip);
+//        System.out.println("目的主机名： " + ip.dst_ip);
+//        System.out.println("----------------------------------------------");
+//    }
 
     private String getProtocol(IPPacket ip) {
         return switch (ip.protocol) {
@@ -200,11 +225,4 @@ public class JpCapController implements Runnable {
         };
     }
 
-    public static boolean isPause() {
-        return pause;
-    }
-
-    public static Thread getThread() {
-        return thread;
-    }
 }
