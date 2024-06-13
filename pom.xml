@@ -14,5 +14,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!-- 在这里添加你的依赖 -->
+        <dependency>
+            <groupId>jpcap</groupId>  <!-- 库名称，也可以自定义 -->
+            <artifactId>jpcap</artifactId>    <!--库名称，也可以自定义-->
+            <version>1.0</version> <!--版本号-->
+            <scope>system</scope> <!--作用域-->
+            <systemPath>${basedir}\src\lib\jpcap.jar</systemPath> <!--项目根目录下的lib文件夹下-->
+        </dependency>
+    </dependencies>
+
 
 </project>
